@@ -8,7 +8,7 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.12 # or whatever python version the project specifically requires
-      # - key: OPENAI_API_KEY # (Reminder to set these manually in Render dashboard)
+      # - key: GEMINI_API_KEY # (Reminder to set these manually in Render dashboard)
       #   sync: false
       # - key: VITE_SUPABASE_URL
       #   sync: false
