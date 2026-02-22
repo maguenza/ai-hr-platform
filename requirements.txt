@@ -1,0 +1,11 @@
+crewai
+langchain-google-genai
+pdfplumber
+beautifulsoup4
+requests
+python-dotenv
+markdown
+flask-cors==6.0.2
+gunicorn==23.0.0
+supabase>=2.0.0
+python-dotenv==1.0.1

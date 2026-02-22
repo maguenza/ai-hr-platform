@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Optimizer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <main class="glass-container">
+        <header>
+            <h1>AI Resume <span>Optimizer</span></h1>
+            <p>Tailor your resume against any live job description with our Multi-Agent AI system.</p>
+        </header>
+
+        <section class="form-section">
+            <form id="optimize-form">
+                <div class="input-group">
+                    <label for="url">Job Description URL</label>
+                    <input type="url" id="url" name="url" placeholder="https://jobs.lever.co/..." required autocomplete="off">
+                </div>
+                <button type="submit" id="submit-btn">
+                    <span>Generate & Download PDF</span>
+                    <div class="loading-ring hidden" id="spinner"></div>
+                </button>
+            </form>
+        </section>
+
+        <section id="status-message" class="hidden">
+            <div class="pulse-container">
+                <div class="pulse"></div>
+            </div>
+            <p id="status-text">Agents are crawling the URL and strategizing keywords...</p>
+        </section>
+        
+        <section id="error-message" class="hidden error">
+            <p id="error-text"></p>
+        </section>
+    </main>
+
+    <script>
+        const form = document.getElementById('optimize-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const spinner = document.getElementById('spinner');
+        const btnText = submitBtn.querySelector('span');
+        const statusMessage = document.getElementById('status-message');
+        const statusText = document.getElementById('status-text');
+        const errorMessage = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
+
+        const loadingTexts = [
+            "Agents are crawling the URL and extracting skills...",
+            "Keyword Strategist is prioritizing ATS tags...",
+            "Resume Editor is rewriting bullet points seamlessly...",
+            "Security Reviewer is scoring your resume and checking for PII...",
+            "File Manager is formatting the document...",
+            "Converting finalized markdown to PDF..."
+        ];
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const urlInput = document.getElementById('url').value;
+            if(!urlInput) return;
+
+            // UI Loading State
+            submitBtn.disabled = true;
+            btnText.textContent = "Processing...";
+            spinner.classList.remove('hidden');
+            errorMessage.classList.add('hidden');
+            statusMessage.classList.remove('hidden');
+
+            let textIndex = 0;
+            statusText.textContent = loadingTexts[0];
+            const interval = setInterval(() => {
+                textIndex = (textIndex + 1) % loadingTexts.length;
+                statusText.textContent = loadingTexts[textIndex];
+            }, 6000);
+
+            try {
+                const response = await fetch('/api/optimize', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: urlInput })
+                });
+
+                clearInterval(interval);
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || "An unknown error occurred during pipeline execution.");
+                }
+
+                statusText.innerText = "Resume optimized successfully! Downloading PDF...";
+                
+                // Trigger download
+                const blob = await response.blob();
+                const downloadUrl = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = downloadUrl;
+                
+                // get filename from the header if possible, else generic
+                const contentDisposition = response.headers.get('Content-Disposition');
+                let filename = "Optimized_Resume.pdf";
+                if (contentDisposition && contentDisposition.includes('filename=')) {
+                    filename = contentDisposition.split('filename=')[1].replace(/["']/g, "");
+                }
+                a.download = filename;
+                
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(downloadUrl);
+                
+                setTimeout(() => {
+                    statusMessage.classList.add('hidden');
+                }, 4000);
+
+            } catch (err) {
+                clearInterval(interval);
+                statusMessage.classList.add('hidden');
+                errorMessage.classList.remove('hidden');
+                errorText.textContent = "Error: " + err.message;
+            } finally {
+                // Reset UI
+                submitBtn.disabled = false;
+                btnText.textContent = "Generate & Download PDF";
+                spinner.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

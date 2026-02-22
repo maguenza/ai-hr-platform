@@ -1,0 +1,37 @@
+services:
+  # The Python Backend API
+  - type: web
+    name: hr-agent-api
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.12 # or whatever python version the project specifically requires
+      # - key: OPENAI_API_KEY # (Reminder to set these manually in Render dashboard)
+      #   sync: false
+      # - key: VITE_SUPABASE_URL
+      #   sync: false
+      # - key: VITE_SUPABASE_ANON_KEY
+      #   sync: false
+
+  # The React Frontend (Static Site)
+  - type: web
+    name: hr-agent-frontend
+    env: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    rootDir: frontend
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      # - key: VITE_API_URL
+      #   sync: false
+      # - key: VITE_SUPABASE_URL
+      #   sync: false
+      # - key: VITE_SUPABASE_ANON_KEY
+      #   sync: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
