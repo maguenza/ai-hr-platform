@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from './supabase';
 import { Sparkles, Mail, Lock, LogIn, UserPlus, AlertCircle } from 'lucide-react';
+import { useAuth } from './AuthContext';
 
 export default function Login() {
     const [isSignUp, setIsSignUp] = useState(false);
@@ -9,6 +11,15 @@ export default function Login() {
     const [loading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
     const [successMsg, setSuccessMsg] = useState('');
+
+    const { session } = useAuth();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (session) {
+            navigate('/', { replace: true });
+        }
+    }, [session, navigate]);
 
     const handleAuth = async (e: React.FormEvent) => {
         e.preventDefault();
