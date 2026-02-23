@@ -213,20 +213,6 @@ export default function App() {
                                 />
                             </div>
 
-                            <label htmlFor="resume" className="text-sm font-medium text-slate-300 ml-1 mt-2">
-                                Base Resume (PDF)
-                            </label>
-                            <div className="relative group">
-                                <input
-                                    type="file"
-                                    id="resume"
-                                    accept=".pdf"
-                                    onChange={(e) => setResumeFile(e.target.files?.[0] || null)}
-                                    required
-                                    disabled={status === 'loading' || status === 'success'}
-                                    className="w-full px-4 py-3 bg-slate-900/50 border border-slate-700/50 rounded-xl text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-500/10 file:text-blue-400 hover:file:bg-blue-500/20 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all shadow-inner cursor-pointer"
-                                />
-                            </div>
 
                             <button
                                 type="submit"
