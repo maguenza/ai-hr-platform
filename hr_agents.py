@@ -1,6 +1,5 @@
 import os
-from crewai import Agent, Task, Crew, Process
-from langchain_google_genai import ChatGoogleGenerativeAI
+from crewai import Agent, Task, Crew, Process, LLM
 from tools import ReadJDFromURLTool, ReadPDFResumeTool, SaveUpdatedResumeTool
 import argparse
 from dotenv import load_dotenv
@@ -9,11 +8,11 @@ import glob
 load_dotenv()
 
 api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
+if api_key:
+    os.environ["GEMINI_API_KEY"] = api_key
 
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-pro",
-    google_api_key=api_key,
-    verbose=True,
+llm = LLM(
+    model="gemini/gemini-2.5-pro",
     temperature=0.5,
 )
 # -----------------
